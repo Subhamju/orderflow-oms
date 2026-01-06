@@ -5,6 +5,7 @@ import com.orderflow.domain.enums.OrderStatus;
 import com.orderflow.dto.OrderRequest;
 import com.orderflow.dto.OrderResponse;
 import com.orderflow.exception.InvalidOrderException;
+import com.orderflow.execution.OrderExecutionEngine;
 import com.orderflow.repository.OrderRepository;
 import com.orderflow.service.OrderService;
 import org.springframework.stereotype.Service;
@@ -14,9 +15,11 @@ import java.time.LocalDateTime;
 @Service
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
+    private final OrderExecutionEngine executionEngine;
 
-    public OrderServiceImpl(OrderRepository orderRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderExecutionEngine executionEngine) {
         this.orderRepository = orderRepository;
+        this.executionEngine = executionEngine;
     }
 
     @Override
@@ -34,6 +37,8 @@ public class OrderServiceImpl implements OrderService {
         order.setCreatedAt(LocalDateTime.now());
 
         Order saveOrder = orderRepository.save(order);
+
+        executionEngine.execute(saveOrder);
 
         return new OrderResponse(
                 saveOrder.getOrderId(),
