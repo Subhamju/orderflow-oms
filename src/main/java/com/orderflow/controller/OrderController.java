@@ -1,6 +1,7 @@
 package com.orderflow.controller;
 
 import com.orderflow.domain.Order;
+import com.orderflow.dto.OrderDetailsResponse;
 import com.orderflow.dto.OrderRequest;
 import com.orderflow.dto.OrderResponse;
 import com.orderflow.service.OrderService;
@@ -21,7 +22,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.placeOrder(request));
     }
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrder(@PathVariable Long id){
+    public ResponseEntity<OrderDetailsResponse> getOrder(@PathVariable Long id){
         return ResponseEntity.ok(orderService.getOrderById(id));
     }
 }

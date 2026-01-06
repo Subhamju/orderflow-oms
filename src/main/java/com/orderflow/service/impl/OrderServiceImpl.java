@@ -2,6 +2,7 @@ package com.orderflow.service.impl;
 
 import com.orderflow.domain.Order;
 import com.orderflow.domain.enums.OrderStatus;
+import com.orderflow.dto.OrderDetailsResponse;
 import com.orderflow.dto.OrderRequest;
 import com.orderflow.dto.OrderResponse;
 import com.orderflow.exception.InvalidOrderException;
@@ -48,10 +49,24 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order getOrderById(Long orderId) {
-        return orderRepository.findById(orderId)
+    public OrderDetailsResponse getOrderById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(()->new InvalidOrderException("Order not found"));
+        return mapToDetailsResponse(order);
     }
+
+    private OrderDetailsResponse mapToDetailsResponse(Order order) {
+        return new OrderDetailsResponse(
+                order.getOrderId(),
+                order.getOrderStatus(),
+                order.getOrderType(),
+                order.getOrderKind(),
+                order.getPrice(),
+                order.getQuantity(),
+                order.getCreatedAt()
+        );
+    }
+
     public void validate(OrderRequest request){
         if(request.getQuantity() == null || request.getQuantity() <= 0){
             throw new InvalidOrderException("Quantity must be positive");
