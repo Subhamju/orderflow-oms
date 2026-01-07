@@ -5,6 +5,7 @@ import com.orderflow.domain.enums.OrderStatus;
 import com.orderflow.dto.OrderDetailsResponse;
 import com.orderflow.dto.OrderRequest;
 import com.orderflow.dto.OrderResponse;
+import com.orderflow.exception.ErrorCode;
 import com.orderflow.exception.InvalidOrderException;
 import com.orderflow.execution.OrderExecutionEngine;
 import com.orderflow.repository.OrderRepository;
@@ -51,7 +52,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDetailsResponse getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(()->new InvalidOrderException("Order not found"));
+                .orElseThrow(()->new InvalidOrderException(
+                        ErrorCode.ORDER_NOT_FOUND,
+                        "Order not found"));
         return mapToDetailsResponse(order);
     }
 
@@ -69,11 +72,15 @@ public class OrderServiceImpl implements OrderService {
 
     public void validate(OrderRequest request){
         if(request.getQuantity() == null || request.getQuantity() <= 0){
-            throw new InvalidOrderException("Quantity must be positive");
+            throw new InvalidOrderException(
+                    ErrorCode.INVALID_ORDER,
+                    "Quantity must be positive");
         }
         if(request.getOrderKind().name().equals("LIMIT") &&
                 (request.getPrice() == null || request.getPrice() <= 0)){
-            throw new InvalidOrderException("Price required for LIMIT order");
+            throw new InvalidOrderException(
+                    ErrorCode.ORDER_NOT_FOUND,
+                    "Price required for LIMIT order");
         }
     }
 }
