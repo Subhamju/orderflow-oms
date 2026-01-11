@@ -43,6 +43,18 @@ It demonstrates asynchronous processing, clean architecture, and extensible desi
 
 ---
 
+## Deployment
+
+The application is fully Dockerized and can be run locally using Docker Compose.
+
+- Spring Boot backend and PostgreSQL run as separate containers
+- Environment-based configuration is used for database connectivity
+- Docker Compose manages service orchestration and networking
+
+This setup enables consistent local development and mirrors real-world deployment practices.
+
+---
+
 ## API Overview
 - `POST /orders` → Place a new order
 - `GET /orders/{id}` → Fetch order details
@@ -69,7 +81,6 @@ This approach ensures that:
 ## Future Enhancements
 - Kafka-based event-driven execution
 - Retry and failure handling with dead-letter queues
-- Dockerized deployment
 - Microservices decomposition
 - Cloud deployment
 
