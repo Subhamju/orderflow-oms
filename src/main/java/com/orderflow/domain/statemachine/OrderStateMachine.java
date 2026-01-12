@@ -20,6 +20,11 @@ public final class OrderStateMachine {
     private OrderStateMachine(){}
 
     public static void validateState(OrderStatus current,OrderStatus next){
+
+        if( current == null && next == OrderStatus.CREATED){
+            return;
+        }
+
         if(!ALLOWED_TRANSITIONS
                 .getOrDefault(current,Set.of())
                 .contains(next)){

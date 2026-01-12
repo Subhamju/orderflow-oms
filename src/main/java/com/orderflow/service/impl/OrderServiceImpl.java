@@ -53,13 +53,15 @@ public class OrderServiceImpl implements OrderService {
         order.transitionTo(OrderStatus.SENT_TO_EXECUTOR);
         orderRepository.save(order);
 
+        OrderStatus ackStatus = order.getOrderStatus();
+
         executionEngine.execute(order);
 
         log.info("Order {} accepted for execution", order.getOrderId());
 
         return new OrderResponse(
                 order.getOrderId(),
-                order.getOrderStatus(),
+                ackStatus,
                 "Order Accepted"
         );
     }
