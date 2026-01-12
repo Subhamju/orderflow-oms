@@ -1,6 +1,6 @@
 package com.orderflow.service.impl;
 
-import com.orderflow.domain.Order;
+import com.orderflow.domain.entity.Order;
 import com.orderflow.domain.enums.OrderStatus;
 import com.orderflow.dto.OrderDetailsResponse;
 import com.orderflow.dto.OrderRequest;
@@ -26,7 +26,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse placeOrder(OrderRequest request) {
-        validate(request);
 
         Order order = new Order();
         order.setUserId(request.getUserId());
@@ -35,17 +34,28 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderKind(request.getOrderKind());
         order.setPrice(request.getPrice());
         order.setQuantity(request.getQuantity());
-        order.setOrderStatus(OrderStatus.CREATED);
+        order.transitionTo(OrderStatus.CREATED);
         order.setCreatedAt(LocalDateTime.now());
+        orderRepository.save(order);
 
-        Order saveOrder = orderRepository.save(order);
+        try{
+            validate(request);
+            order.transitionTo(OrderStatus.VALIDATED);
+            orderRepository.save(order);
+        } catch (InvalidOrderException ex) {
+            order.transitionTo(OrderStatus.REJECTED);
+            orderRepository.save(order);
+            throw ex;
+        }
 
-        executionEngine.execute(saveOrder);
+        executionEngine.execute(order);
+        order.transitionTo(OrderStatus.SENT_TO_EXECUTOR);
+        orderRepository.save(order);
 
         return new OrderResponse(
-                saveOrder.getOrderId(),
-                saveOrder.getOrderStatus(),
-                "Order Placed Successfully"
+                order.getOrderId(),
+                order.getOrderStatus(),
+                "Order Accepted"
         );
     }
 

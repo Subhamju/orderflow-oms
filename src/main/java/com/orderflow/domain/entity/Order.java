@@ -1,8 +1,9 @@
-package com.orderflow.domain;
+package com.orderflow.domain.entity;
 
 import com.orderflow.domain.enums.OrderKind;
 import com.orderflow.domain.enums.OrderStatus;
 import com.orderflow.domain.enums.OrderType;
+import com.orderflow.domain.statemachine.OrderStateMachine;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -95,5 +96,10 @@ public class Order {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public void transitionTo(OrderStatus newStatus){
+        OrderStateMachine.validateState(this.orderStatus, newStatus);
+        this.orderStatus = newStatus;
     }
 }

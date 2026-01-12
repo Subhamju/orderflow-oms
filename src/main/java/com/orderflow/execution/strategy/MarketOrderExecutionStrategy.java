@@ -1,6 +1,6 @@
 package com.orderflow.execution.strategy;
 
-import com.orderflow.domain.Order;
+import com.orderflow.domain.entity.Order;
 import com.orderflow.service.TradeService;
 import org.springframework.stereotype.Component;
 

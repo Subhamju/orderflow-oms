@@ -1,6 +1,6 @@
 package com.orderflow.execution;
 
-import com.orderflow.domain.Order;
+import com.orderflow.domain.entity.Order;
 import com.orderflow.domain.enums.OrderStatus;
 import com.orderflow.execution.strategy.ExecutionStrategy;
 import com.orderflow.execution.strategy.ExecutionStrategyFactory;
@@ -25,11 +25,21 @@ public class DefaultOrderExecutionEngine implements OrderExecutionEngine{
     @Override
     public void execute(Order order) {
         executorService.submit(()-> {
-            order.setOrderStatus(OrderStatus.EXECUTING);
-            orderRepository.save(order);
+            try {
+                order.transitionTo(OrderStatus.EXECUTING);
+                orderRepository.save(order);
 
-            ExecutionStrategy executionStrategy = strategyFactory.getStrategy(order.getOrderKind());
-            executionStrategy.execute(order);
+                ExecutionStrategy strategy =
+                        strategyFactory.getStrategy(order.getOrderKind());
+
+                strategy.execute(order);
+
+                orderRepository.save(order);
+
+            } catch (Exception ex) {
+                order.transitionTo(OrderStatus.FAILED);
+                orderRepository.save(order);
+            }
 
         });
 

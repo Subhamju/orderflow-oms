@@ -1,8 +1,7 @@
 package com.orderflow.service.impl;
 
-import com.orderflow.domain.Order;
-import com.orderflow.domain.Trade;
-import com.orderflow.domain.enums.OrderKind;
+import com.orderflow.domain.entity.Order;
+import com.orderflow.domain.entity.Trade;
 import com.orderflow.domain.enums.OrderStatus;
 import com.orderflow.repository.OrderRepository;
 import com.orderflow.repository.TradeRepository;

@@ -1,6 +1,5 @@
 package com.orderflow.controller;
 
-import com.orderflow.domain.Order;
 import com.orderflow.dto.OrderDetailsResponse;
 import com.orderflow.dto.OrderRequest;
 import com.orderflow.dto.OrderResponse;

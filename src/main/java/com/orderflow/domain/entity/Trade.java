@@ -1,6 +1,5 @@
-package com.orderflow.domain;
+package com.orderflow.domain.entity;
 
-import jakarta.annotation.Generated;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
