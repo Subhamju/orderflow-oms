@@ -11,8 +11,7 @@ public final class OrderStateMachine {
                     OrderStatus.VALIDATED,Set.of(OrderStatus.SENT_TO_EXECUTOR,OrderStatus.REJECTED,OrderStatus.CANCELLED),
                     OrderStatus.SENT_TO_EXECUTOR,Set.of(OrderStatus.EXECUTING,OrderStatus.CANCELLED),
                     OrderStatus.EXECUTING,Set.of(OrderStatus.EXECUTED,OrderStatus.FAILED,OrderStatus.CANCELLED),
-                    OrderStatus.EXECUTED,Set.of(OrderStatus.COMPLETED),
-                    OrderStatus.COMPLETED,Set.of(),
+                    OrderStatus.EXECUTED,Set.of(),
                     OrderStatus.CANCELLED,Set.of(),
                     OrderStatus.FAILED,Set.of(),
                     OrderStatus.REJECTED,Set.of()
