@@ -1,5 +1,7 @@
 # OrderFlow
 
+# OrderFlow
+
 OrderFlow is a backend-focused Order Management and Trade Processing platform inspired by real-world trading systems.
 
 It demonstrates asynchronous processing, clean architecture, and extensible design patterns commonly used in large-scale backend systems.
@@ -40,6 +42,8 @@ It demonstrates asynchronous processing, clean architecture, and extensible desi
 - Command vs Query DTO separation for clean API contracts
 - Centralized exception handling with structured error responses
 - Concurrency handled using ExecutorService to isolate execution workloads
+- **Idempotent order placement using client-supplied Idempotency-Key**
+- **Database-enforced uniqueness to guarantee exactly-once order creation**
 
 ---
 
@@ -58,6 +62,25 @@ This setup enables consistent local development and mirrors real-world deploymen
 ## API Overview
 - `POST /orders` → Place a new order
 - `GET /orders/{id}` → Fetch order details
+
+---
+
+## API Semantics
+
+### Idempotent Order Placement
+
+The `POST /orders` endpoint supports **idempotent order creation** using the
+`Idempotency-Key` request header.
+
+- For a given `(userId, Idempotency-Key)` combination, only **one order** is created.
+- Retrying the same request with the same key returns the **original order**.
+- Duplicate requests do **not** trigger duplicate executions.
+
+Idempotency is enforced using:
+- A **database-level unique constraint** on `(user_id, idempotency_key)`
+- **Service-layer logic** to safely handle concurrent requests
+
+This guarantees **exactly-once order creation** even under retries or concurrent submissions.
 
 ---
 

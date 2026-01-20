@@ -6,11 +6,14 @@ public class OrderResponse {
     private Long orderId;
     private OrderStatus orderStatus;
     private String message;
+    private boolean duplicate;
 
-    public OrderResponse(Long orderId, OrderStatus orderStatus, String message) {
+   
+    public OrderResponse(Long orderId, OrderStatus orderStatus, String message,boolean duplicate) {
         this.orderId = orderId;
         this.orderStatus = orderStatus;
         this.message = message;
+        this.duplicate = duplicate;
     }
 
     public Long getOrderId() {
@@ -23,5 +26,8 @@ public class OrderResponse {
 
     public String getMessage() {
         return message;
+    }
+     public boolean isDuplicate() {
+        return duplicate;
     }
 }

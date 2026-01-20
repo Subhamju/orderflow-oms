@@ -9,12 +9,19 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "orders",
+    uniqueConstraints = @UniqueConstraint(
+        name = "uk_orders_user_idempotency",
+        columnNames = {"user_id","idempotency_key"}
+    )
+)
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
+    @Column(name = "user_id",nullable = false)
     private Long userId;
+    @Column(name = "instrument_id",nullable = false)
     private Long instrumentId;
     @Enumerated(EnumType.STRING)
     private OrderType orderType;
@@ -24,7 +31,19 @@ public class Order {
     private Integer quantity;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
+    @Column(name = "created_at",nullable = false)
     private LocalDateTime createdAt;
+    @Column(name = "idempotency_key",length = 100,nullable = false)
+    private String idempotencyKey;
+    
+
+    public String getIdempotencyKey() {
+        return idempotencyKey;
+    }
+
+    public void setIdempotencyKey(String idempotencyKey) {
+        this.idempotencyKey = idempotencyKey;
+    }
 
     public Long getOrderId() {
         return orderId;

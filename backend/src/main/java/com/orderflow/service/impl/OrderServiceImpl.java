@@ -12,9 +12,12 @@ import com.orderflow.execution.OrderExecutionEngine;
 import com.orderflow.repository.OrderRepository;
 import com.orderflow.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -27,9 +30,21 @@ public class OrderServiceImpl implements OrderService {
         this.executionEngine = executionEngine;
     }
     @Override
-    public OrderResponse placeOrder(OrderRequest request) {
+    public OrderResponse placeOrder(OrderRequest request,String idempotencyKey) {
 
         validate(request);
+
+        Optional<Order> existing = orderRepository.findByUserIdAndIdempotencyKey(
+            request.getUserId(), idempotencyKey);
+
+        if(existing.isPresent())
+        {
+            Order order = existing.get();
+            return new OrderResponse(order.getOrderId(), 
+            order.getOrderStatus(), 
+            "Order already exists",
+        true);
+        }
 
         Order order = new Order();
         order.setUserId(request.getUserId());
@@ -38,15 +53,27 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderKind(request.getOrderKind());
         order.setQuantity(request.getQuantity());
         order.setCreatedAt(LocalDateTime.now());
+        order.setIdempotencyKey(idempotencyKey);
         if (request.getOrderKind() == OrderKind.LIMIT) {
             order.setPrice(request.getPrice());
         } else {
             // MARKET order: price is not applicable
             order.setPrice(null);
         }
+        try {
+            order.transitionTo(OrderStatus.CREATED);
+            orderRepository.save(order);
+            
+        } catch (DataIntegrityViolationException ex) {
+            Order winner = orderRepository.findByUserIdAndIdempotencyKey(request.getUserId(),
+             idempotencyKey).orElseThrow(()-> ex);
 
-        order.transitionTo(OrderStatus.CREATED);
-        orderRepository.save(order);
+            return new OrderResponse(winner.getOrderId(),
+             winner.getOrderStatus(), 
+            "Order already exists",
+        true);
+        }
+        
 
         order.transitionTo(OrderStatus.VALIDATED);
         orderRepository.save(order);
@@ -63,7 +90,8 @@ public class OrderServiceImpl implements OrderService {
         return new OrderResponse(
                 order.getOrderId(),
                 ackStatus,
-                "Order Accepted"
+                "Order Accepted",
+                false
         );
     }
 

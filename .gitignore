@@ -7,6 +7,6 @@ backend/target/
 
 # OS / IDE
 .DS_Store
+*.iml
 .idea/
 .vscode/
-
