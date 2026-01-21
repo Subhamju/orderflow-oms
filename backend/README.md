@@ -1,7 +1,5 @@
 # OrderFlow
 
-# OrderFlow
-
 OrderFlow is a backend-focused Order Management and Trade Processing platform inspired by real-world trading systems.
 
 It demonstrates asynchronous processing, clean architecture, and extensible design patterns commonly used in large-scale backend systems.
